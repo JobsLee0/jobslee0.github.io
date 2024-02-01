@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/><meta name="theme-color" content="#3b3e43"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no"/><title>记一次JVM泄漏问题及解决方案 - 卓恒Lee的小宇宙</title><meta name="description" content="记一次整个部门耗时6个月未解决的JVM泄漏问题"/><meta property="og:description" content="记一次整个部门耗时6个月未解决的JVM泄漏问题"/>    <meta name="keywords" content="博客,技术,后端,开源,Blog,Java,Groovy,Golang"/><link rel="dns-prefetch" href="https://jobslee0.github.io"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://jobslee0.github.io"><link rel="icon" type="image/png" href="https://b3log.org/images/brand/solo-128.png"/><link rel="apple-touch-icon" href="https://b3log.org/images/brand/solo-128.png"><link rel="shortcut icon" type="image/x-icon" href="https://b3log.org/images/brand/solo-128.png"><meta name="copyright" content="B3log"/><meta http-equiv="Window-target" content="_top"/><meta property="og:locale" content="zh_CN"/><meta property="og:title" content="记一次JVM泄漏问题及解决方案 - 卓恒Lee的小宇宙"/><meta property="og:site_name" content="卓恒Lee的小宇宙"/><meta property="og:url"      content="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html?"/><meta property="og:image" content="https://b3log.org/images/brand/solo-128.png"/><link rel="search" type="application/opensearchdescription+xml" title="记一次JVM泄漏问题及解决方案 - 卓恒Lee的小宇宙" href="/opensearch.xml"><link href="https://jobslee0.github.io/rss.xml" title="RSS" type="application/rss+xml" rel="alternate"/><link rel="manifest" href="https://jobslee0.github.io/manifest.json">        <link rel="canonical" href="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html">        <link rel="stylesheet"
+              href="https://jobslee0.github.io/skins/yilia/css/base.css?1706799235827"/>
+            <link rel="prev" title="算法学习笔记" href="https://jobslee0.github.io/articles/2024/02/01/1706798113215.html">
+            <link rel="next" title="PSQ队列核心原理简析" href="https://jobslee0.github.io/articles/2024/02/01/1706798443489.html">
+    <script src="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/js/icons/ant.js" async="" id="vditorIconScript"></script></head>
+<body>
+<div class="side fn__flex-column">
+    <div class="overlay">
+        <a onclick="$('.side .toc').show()" href="javascript:void(0)" class="toc-btn">目录</a>
+    </div>
+    <div class="user__sites">
+    <a href="https://ld246.com/member/DragonMoon"
+       title="https://ld246.com/member/DragonMoon"
+       class="user__site"
+       target="_blank" rel="noopener nofollow">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path fill="#d23f31" style="fill: var(--color1, #d23f31)" d="M5.787 17.226h17.033l5.954 9.528c0.47 0.752 0.003 1.361-1.042 1.361h-15.141z"></path>
+            <path d="M10.74 3.927h17.033c1.045 0 1.512 0.609 1.042 1.361l-5.954 9.528h-19.872l6.379-10.209c0.235-0.376 0.849-0.681 1.372-0.681z"></path>
+            <path d="M2.953 17.226h2.839l6.804 10.889h-1.892c-0.523 0-1.137-0.305-1.372-0.681z"></path>
+        </svg>
+    </a>
+
+
+    </div>
+    <header class="content fn__flex-1">
+        <a href="https://jobslee0.github.io">
+            <img class="avatar" src="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100" title="" alt=""/>
+        </a>
+        <hgroup>
+            <h1>
+                <a href="https://jobslee0.github.io">卓恒Lee的小宇宙</a>
+            </h1>
+        </hgroup>
+        <p class="subtitle">
+            山不在高，有仙则名；水不在深，有龙则灵。
+        </p>
+        <nav>
+            <ul>
+                <li>
+                    <a href="https://jobslee0.github.io/tags.html">标签墙</a>
+                    &nbsp; &nbsp;
+                    <a href="https://jobslee0.github.io/archives.html">存档</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <footer>
+            <div class="vditor-reset">仰望星空
+
+<!-- 公告栏可使用 HTML、JavaScript，比如可以在此加入第三方统计 js --></div>
+        <a rel="alternate" href="https://jobslee0.github.io/rss.xml" title="订阅" class="icon-rss"></a>
+    </footer>
+        <div class="toc">
+            <a onclick="$('.side .toc').hide();" href="javascript:void(0)" class="close">X</a>
+<ul class="article__toc">
+        <li class="toc__h4">
+            <a href="#toc_h4_0">问题现象</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_1">问题分析</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_2">现象分析</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_3">问题猜测</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_4">尝试解决</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_5">尝试结果</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_6">初步结论</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_7">问题解决</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_8">问题总结</a>
+        </li>
+        <li class="toc__h5">
+            <a href="#toc_h5_9">参考文档</a>
+        </li>
+</ul>        </div>
+</div>
+<main>
+    <article class="post">
+        <header class="fn__flex">
+            <h2 class="fn__flex-1">
+                <a rel="bookmark" href="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html">
+                    记一次JVM泄漏问题及解决方案
+                </a>
+            </h2>
+            <time><span class="icon-date"></span> 2024-02-01</time>
+        </header>
+        <div class="article__footer fn__flex">
+            <span class="icon-tag fn__flex-center"></span>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="tags fn__flex-1 fn__flex-center">
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/Java">
+                        Java</a>
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/JVM">
+                        JVM</a>
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F">
+                        内存泄漏</a>
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/%E5%8E%9F%E5%88%9B">
+                        原创</a>
+            </div>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+                <a href="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html#b3logsolocomments"
+                   class="vditor-tooltipped__n vditor-tooltipped link fn__flex-center"
+                   aria-label="评论">
+                    <span data-uvstatcmt="1706798263657">0</span>
+                    <span class="icon-chat"></span>
+                </a>
+            <a class="vditor-tooltipped__n vditor-tooltipped link fn__flex-center"
+               href="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html"
+               aria-label="浏览">
+                <span data-uvstaturl="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html">0</span>
+                <span class="icon-views"></span>
+            </a>
+            <a rel="nofollow" href="https://jobslee0.github.io/authors/1706712761452" class="fn__flex-center">
+                <img class="avatar" title="DragonMoon" alt="DragonMoon"
+                     src="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100"/>
+            </a>
+        </div>
+
+        <section class="abstract vditor-reset">
+            <h4 id="toc_h4_0">问题现象</h4>
+<p>前段时间，公司线上的服务器开始出现pod反复重启的现象，通过普罗米修斯监控大盘，发现是JVM内存突破了pod限制。</p>
+<h4 id="toc_h4_1">问题分析</h4>
+<h5 id="toc_h5_2">现象分析</h5>
+<ol>
+<li>硬件配置</li>
+</ol>
+<p>我们的应用服务是使用k8s来部署的，应用的实现是jdk8，出现问题的服务pod分配的总数为3台，每个pod分配3G内存和1个高性能CPU，pod的内存required和limit分别为2G和3G。</p>
+<ol start="2">
+<li>JVM参数</li>
+</ol>
+<p>默认参数，未配置。</p>
+<ol start="3">
+<li>JVM内存分析</li>
+</ol>
+<p>年轻代正常；老年代占用较多，可能有大对象存在；老年代内存增长同pod增长趋势相同，且有按小时增长迹象，并会触发FullGC。</p>
+<h5 id="toc_h5_3">问题猜测</h5>
+<ol>
+<li>随着业务增长，pod内存可能确实不足</li>
+<li>JVM默认参数无法有效限制JVM的内存使用</li>
+<li>某个小时任务存在问题，且使用了大对象</li>
+<li>大对象触发FullGC后并没有有效释放内存</li>
+<li>查询k8s官方Issues，是否存在pod与Java版本兼容bug</li>
+</ol>
+<h5 id="toc_h5_4">尝试解决</h5>
+<ol>
+<li>增加pod内存，使得<code>required=4G limit=5G</code></li>
+<li>增加JVM参数限制<code>-Xms=4G -Xmx=4G</code>，堆外内存也要限制，（特别注意jdk8变为了元空间）<code>-XX:MetaspaceSize=300m -XX:MaxMetaspaceSize=300m</code></li>
+<li>翻查代码，确实发现某个定时任务存在着大批量的List内存存储，且长时间不释放，但是短时间内没有更好的修改替代方案</li>
+<li>调整年轻代大小<code>-Xmn</code>，使大对象在年轻代就被回收，而不进入老年代</li>
+<li>升级jdk8的小版本，提升jvm对容器限制的感知（这块见参考文档3）</li>
+</ol>
+<h5 id="toc_h5_5">尝试结果</h5>
+<ol>
+<li>JVM内存增长导致的重启次数变得减少一点，部分FullGC之后pod容器依然健在，但是时间久了依然会被kill重启</li>
+<li>大对象没有被提前回收，依然进入了老年代，且FullGC明显增多</li>
+</ol>
+<h5 id="toc_h5_6">初步结论</h5>
+<ol>
+<li>业务增长pod内存确实需要适当增加</li>
+<li>JVM参数需要进行手动限制，但是年轻代大小可以不需要调整，反而可以降低FullGC次数</li>
+<li>代码端想更好的优化方法，尽量让数据对象生命周期缩短，但是改动依然比较难</li>
+<li>jdk8小版本有对容器限制感知的修复，有一定用处（这块见参考文档3）</li>
+</ol>
+<h4 id="toc_h4_7">问题解决</h4>
+<p>保持上面的解决参数和思路，我们的服务勉强保持了一段时间，但是告警和重启依然存在，实在令人头疼，很明显还是有一部分JVM的内存泄漏。</p>
+<p>后来通过不断的排查监控大盘，我发现堆内内存经过FullGC后，都可以做到到达临界线后不再增长，这说明堆内参数大小和限制都起到了很好的作用；但是要知道，JVM还有一部分叫做堆外内存的东西，参数中限制了我们常知道的MetaSpace，在大盘中我却发现了non-heap memory部分总有比MetaSpace多出的300M，其增长趋势同pod内存一样一致，只是不是那么明显。</p>
+<p>这引发了我进一步的思考，堆外内存是不是除了元数据区，还有一块未曾想到的区域？</p>
+<p>经过翻查资料：</p>
+<p><img src="https://b3logfile.com/file/2024/02/1673343775722-6jHYA0I.png?imageView2/2/w/1280/format/jpg/interlace/1/q/100" alt="1673343775722.png"></p>
+<p>发现有一块叫做Direct Memory的区域，这块区域就是我们常提到的NIO为了减少内存拷贝而直接申请的部分，这部分在常见数据库读写客户端中大量存在。</p>
+<p>通过排查代码，果不其然，代码除了保留List大对象之外，还大量使用了RedisTemplate对象，这个客户端底层连接基于netty实现，正是NIO那部分。</p>
+<p>于是，加上<code>-MaxDirectMemorySize</code>参数后，再次测试，JVM内存稳固被限制，果然没有问题了！</p>
+<h4 id="toc_h4_8">问题总结</h4>
+<p>总的来看，这次的问题<code>DirectMemory</code>是一个主要问题，代码的<code>大对象处理</code>是一个次要问题，其次才应该考虑对JVM的<code>FullGC</code>次数进行优化。</p>
+<p><strong>被忽略的<code>DirectMemory</code>因为默认为堆大小的1/4，加上我们大量基于<code>RedisTemplate</code>中NIO机制的Redis读写和本身POD的大小有限，最终这部分未被考虑的内存不断增长，导致最后POD内存溢出被kill掉，而这个过程因为本身还未达到JVM本身内存大小的限制，所以也是没有看到JVM的OOM日志的原因。</strong></p>
+<p>这里再对<code>DirectMemory</code>进行一个简单的总结：</p>
+<ol>
+<li>Direct Memory 不是由Java虚拟机直接管理的，而是由操作系统管理。因此，Direct Memory 不会受到Java虚拟机的垃圾回收机制的影响，它的回收是由操作系统自行处理的。</li>
+<li>虽然Direct Memory不是由Java虚拟机管理的，但是Java虚拟机会在启动时将一块内存注册到操作系统中，用于存放 Direct Memory，这块内存也可以被限制大小；同样，Direct Memory在必要时需要手动进行释放，否则会出现内存泄漏的情况。</li>
+<li>JVM中的Direct Memory是通过Native Memory来实现的，即直接在操作系统中申请的内存空间，而不是通过Java Heap来分配的。通常，Direct Memory可以通过调用java.nio.Buffer类的clean()方法进行释放。此外，也可以通过反射来调用sun.misc.Cleaner类的clean()方法来释放Direct Memory。在JDK9中，引入了一个新的API，即jdk.internal.misc.Unsafe类的invokeCleaner()方法，该方法可以用于显式地释放Direct Memory。调用该方法会触发Cleaner机制，异步清理Direct Memory。当该内存块没有被引用时，Cleaner线程将清理该内存块。</li>
+<li><code>MaxDirectMemorySize</code> 是控制 Direct Memory 最大分配空间的参数，它的默认值与 Java 堆最大空间有关，通常为 Java 堆最大空间的1/4。当应用程序申请的 Direct Memory 超过了这个值时，将会抛出 <code>OutOfMemoryError</code> 异常。</li>
+</ol>
+<p>JVM是一个复杂的大工程，它帮我们很好的完成了对内存的管理；出现了内存泄漏不可怕，要从现象和问题本身出发，要从JVM本身出发，万万不能被所谓的“八股文”和“权威”给束缚住，上来就考虑GC优化。</p>
+<p>那些被刻板经验给忽略的，往往就是真相，仅此而已。</p>
+<h5 id="toc_h5_9">参考文档</h5>
+<ol>
+<li><a href="https://blog.csdn.net/tterminator/article/details/54342666" target="_blank">https://blog.csdn.net/tterminator/article/details/54342666</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/370241822" target="_blank">https://zhuanlan.zhihu.com/p/370241822</a></li>
+<li><a href="https://blog.51cto.com/lookingdream/4046529" target="_blank">https://blog.51cto.com/lookingdream/4046529</a></li>
+<li><a href="https://juejin.cn/post/6844903894863052814" target="_blank">https://juejin.cn/post/6844903894863052814</a></li>
+</ol>
+
+                <aside class="fn__flex">
+                        <a class="fn__flex-1 fn__flex-inline" rel="prev" href="https://jobslee0.github.io/articles/2024/02/01/1706798113215.html">
+                            <strong>&lt;</strong>
+                            <span>&nbsp; 算法学习笔记&nbsp;&nbsp;&nbsp;</span>
+                        </a>
+                        <a class="fn__flex-inline" rel="next" href="https://jobslee0.github.io/articles/2024/02/01/1706798443489.html">
+                            <span>PSQ队列核心原理简析&nbsp; </span>
+                            <strong>&gt;</strong>
+                        </a>
+                </aside>
+        </section>
+
+        <footer class="fn-clear share">
+            <div class="fn-right">
+<div class="article__share"
+     data-title="记一次JVM泄漏问题及解决方案"
+     data-blogtitle="卓恒Lee的小宇宙"
+     data-url="https://jobslee0.github.io/articles/2024/02/01/1706798263657.html"
+     data-avatar="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100">
+    <span class="item" data-type="qqz">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M22.824 13.989l-8.348 6.287s3.351 0.522 8.404 0.461l-0.23-1.040 7.2-6.549c0.132-0.12 0.183-0.312 0.129-0.487s-0.203-0.299-0.377-0.314l-9.492-0.856-3.708-9.213c-0.068-0.169-0.226-0.279-0.401-0.279s-0.333 0.11-0.401 0.279l-3.708 9.213-9.492 0.856c-0.174 0.015-0.323 0.139-0.377 0.314s-0.004 0.366 0.129 0.487l7.2 6.549-2.158 9.742c-0.040 0.178 0.026 0.365 0.168 0.474 0.142 0.107 0.331 0.115 0.481 0.021l8.158-5.165 8.158 5.165c0.070 0.045 0.147 0.066 0.225 0.066 0.090 0 0.18-0.029 0.256-0.086 0.142-0.109 0.208-0.295 0.168-0.474l-1.707-7.704c0.732-0.386 1.538-1.040 1.538-1.040s-3.195 1.638-14.664 0.838l8.312-6.325s-0.327-0.534-10.744-0.914c-0.697-0.026 8.493-1.83 15.281-0.305z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="wechat">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M9.062 9.203c0-0.859-0.562-1.422-1.422-1.422-0.844 0-1.703 0.562-1.703 1.422 0 0.844 0.859 1.406 1.703 1.406 0.859 0 1.422-0.562 1.422-1.406zM20.672 17.125c0-0.562-0.562-1.125-1.422-1.125-0.562 0-1.125 0.562-1.125 1.125 0 0.578 0.562 1.141 1.125 1.141 0.859 0 1.422-0.562 1.422-1.141zM16.984 9.203c0-0.859-0.562-1.422-1.406-1.422-0.859 0-1.703 0.562-1.703 1.422 0 0.844 0.844 1.406 1.703 1.406 0.844 0 1.406-0.562 1.406-1.406zM26.906 17.125c0-0.562-0.578-1.125-1.422-1.125-0.562 0-1.125 0.562-1.125 1.125 0 0.578 0.562 1.141 1.125 1.141 0.844 0 1.422-0.562 1.422-1.141zM22.75 10.922c-0.359-0.047-0.719-0.063-1.094-0.063-5.375 0-9.625 4.016-9.625 8.953 0 0.828 0.125 1.625 0.359 2.375-0.359 0.031-0.703 0.047-1.063 0.047-1.422 0-2.547-0.281-3.969-0.562l-3.953 1.984 1.125-3.406c-2.828-1.984-4.531-4.547-4.531-7.656 0-5.391 5.094-9.625 11.328-9.625 5.563 0 10.453 3.391 11.422 7.953zM32 19.687c0 2.547-1.688 4.813-3.969 6.516l0.859 2.828-3.109-1.703c-1.141 0.281-2.281 0.578-3.406 0.578-5.391 0-9.625-3.688-9.625-8.219s4.234-8.219 9.625-8.219c5.094 0 9.625 3.688 9.625 8.219z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="weibo">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M13.444 27.064c-5.3 0.525-9.875-1.875-10.219-5.35-0.344-3.481 3.675-6.719 8.969-7.244 5.3-0.525 9.875 1.875 10.212 5.35 0.35 3.481-3.669 6.725-8.963 7.244zM24.038 15.521c-0.45-0.137-0.762-0.225-0.525-0.819 0.512-1.287 0.563-2.394 0.006-3.188-1.038-1.481-3.881-1.406-7.137-0.037 0 0-1.025 0.444-0.762-0.363 0.5-1.613 0.425-2.956-0.356-3.737-1.769-1.769-6.469 0.069-10.5 4.1-3.013 3.006-4.763 6.212-4.763 8.981 0 5.287 6.787 8.506 13.425 8.506 8.7 0 14.494-5.056 14.494-9.069 0-2.431-2.044-3.806-3.881-4.375z"></path>
+            <path d="M29.819 5.833c-2.1-2.331-5.2-3.219-8.063-2.612v0c-0.663 0.144-1.081 0.794-0.938 1.45 0.144 0.662 0.788 1.081 1.45 0.938 2.038-0.431 4.238 0.2 5.731 1.856s1.9 3.913 1.256 5.888v0c-0.206 0.644 0.144 1.331 0.788 1.544 0.644 0.206 1.331-0.144 1.544-0.787v-0.006c0.9-2.762 0.331-5.938-1.769-8.269z"></path>
+            <path d="M26.588 8.752c-1.025-1.138-2.538-1.569-3.925-1.269-0.569 0.119-0.931 0.688-0.813 1.256 0.125 0.569 0.688 0.931 1.25 0.806v0c0.681-0.144 1.419 0.069 1.919 0.619 0.5 0.556 0.637 1.313 0.419 1.975v0c-0.175 0.55 0.125 1.15 0.681 1.331 0.556 0.175 1.15-0.125 1.331-0.681 0.438-1.356 0.163-2.906-0.863-4.037z"></path>
+            <path d="M13.738 20.771c-0.188 0.319-0.594 0.469-0.912 0.337-0.319-0.125-0.412-0.488-0.231-0.794 0.188-0.306 0.581-0.456 0.894-0.337 0.313 0.113 0.425 0.469 0.25 0.794zM12.044 22.933c-0.512 0.819-1.613 1.175-2.438 0.8-0.813-0.369-1.056-1.319-0.544-2.119 0.506-0.794 1.569-1.15 2.388-0.806 0.831 0.356 1.1 1.3 0.594 2.125zM13.969 17.146c-2.519-0.656-5.369 0.6-6.463 2.819-1.119 2.262-0.037 4.781 2.506 5.606 2.638 0.85 5.75-0.456 6.831-2.894 1.069-2.394-0.262-4.85-2.875-5.531z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="twitter">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M32.003 6.075c-1.175 0.525-2.444 0.875-3.769 1.031 1.356-0.813 2.394-2.1 2.887-3.631-1.269 0.75-2.675 1.3-4.169 1.594-1.2-1.275-2.906-2.069-4.794-2.069-3.625 0-6.563 2.938-6.563 6.563 0 0.512 0.056 1.012 0.169 1.494-5.456-0.275-10.294-2.888-13.531-6.862-0.563 0.969-0.887 2.1-0.887 3.3 0 2.275 1.156 4.287 2.919 5.463-1.075-0.031-2.087-0.331-2.975-0.819 0 0.025 0 0.056 0 0.081 0 3.181 2.263 5.838 5.269 6.437-0.55 0.15-1.131 0.231-1.731 0.231-0.425 0-0.831-0.044-1.237-0.119 0.838 2.606 3.263 4.506 6.131 4.563-2.25 1.762-5.075 2.813-8.156 2.813-0.531 0-1.050-0.031-1.569-0.094 2.913 1.869 6.362 2.95 10.069 2.95 12.075 0 18.681-10.006 18.681-18.681 0-0.287-0.006-0.569-0.019-0.85 1.281-0.919 2.394-2.075 3.275-3.394z"></path>
+        </svg>
+    </span>
+    <span class="item__qr"></span>
+</div>            </div>
+        </footer>
+            <div id="relevantArticles" class="abstract"></div>
+            <div id="randomArticles" class="abstract"></div>
+        <br>
+    </article>
+        <div style="padding: 30px 60px 30px 50px;" id="gitalk-container"></div>
+        <div id="b3logsolocomments"></div>
+        <div id="vcomment" style="padding: 30px 60px 30px 50px;" data-name="DragonMoon"
+             data-postId="1706798263657"></div>
+
+<footer class="footer">
+    <div class="fn-clear">
+        浏览数：<span data-uvstaturl="https://jobslee0.github.io">0</span>
+        &nbsp;
+        文章总数：12
+        <br>
+        &copy; 2024
+        <a href="https://jobslee0.github.io">卓恒Lee的小宇宙</a>
+        
+    </div>
+    <span onclick="Util.goTop()" class="icon-goup"></span>
+</footer>
+<script>
+  var Label = {
+    speech: true,
+    servePath: "https://jobslee0.github.io",
+    staticServePath: "https://jobslee0.github.io",
+    luteAvailable: false,
+    hljsStyle: 'github',
+    langLabel: "zh_CN",
+    version: "4.4.0",
+    staticSite: true,
+    showCodeBlockLn: false,
+    articleId: "1706798263657",
+  }
+</script>
+<script src="https://jobslee0.github.io/skins/yilia/js/common.min.js?1706799235827"></script>
+
+
+<script type="text/javascript">
+    Util.addScript('https://jobslee0.github.io/js/page.min.js?1706799235827', 'soloPageScript')
+    var page = new Page({
+        "commentContentCannotEmptyLabel": "评论不能为空",
+        "oId": "1706798263657",
+        "blogHost": "https://jobslee0.github.io",
+        "randomArticles1Label": "随机阅读：",
+        "externalRelevantArticles1Label": "站外相关阅读："
+    });
+    $(document).ready(function () {
+        page.load();
+        page.tips.externalRelevantArticlesDisplayCount = "0";
+            page.loadRandomArticles();
+            page.loadRelevantArticles('1706798263657', '<h4>相关阅读：</h4>');
+        page.share()
+    });
+</script>
+</main>
+</body>
+</html>
+
+<!-- Generated by Latke (https://github.com/88250/latke) in 6ms, 2024/02/01 22:56:39 -->

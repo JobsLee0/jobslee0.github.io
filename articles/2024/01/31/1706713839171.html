@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/><meta name="theme-color" content="#3b3e43"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="format-detection" content="telephone=no"/><title>Groovy应用集成 - 卓恒Lee的小宇宙</title><meta name="description" content="Groovy翻译系列第二节，翻译一下集成说明。"/><meta property="og:description" content="Groovy翻译系列第二节，翻译一下集成说明。"/>    <meta name="keywords" content="博客,技术,后端,开源,Blog,Java,Groovy,Golang"/><link rel="dns-prefetch" href="https://jobslee0.github.io"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://jobslee0.github.io"><link rel="icon" type="image/png" href="https://b3log.org/images/brand/solo-128.png"/><link rel="apple-touch-icon" href="https://b3log.org/images/brand/solo-128.png"><link rel="shortcut icon" type="image/x-icon" href="https://b3log.org/images/brand/solo-128.png"><meta name="copyright" content="B3log"/><meta http-equiv="Window-target" content="_top"/><meta property="og:locale" content="zh_CN"/><meta property="og:title" content="Groovy应用集成 - 卓恒Lee的小宇宙"/><meta property="og:site_name" content="卓恒Lee的小宇宙"/><meta property="og:url"      content="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html?"/><meta property="og:image" content="https://b3log.org/images/brand/solo-128.png"/><link rel="search" type="application/opensearchdescription+xml" title="Groovy应用集成 - 卓恒Lee的小宇宙" href="/opensearch.xml"><link href="https://jobslee0.github.io/rss.xml" title="RSS" type="application/rss+xml" rel="alternate"/><link rel="manifest" href="https://jobslee0.github.io/manifest.json">        <link rel="canonical" href="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html">        <link rel="stylesheet"
+              href="https://jobslee0.github.io/skins/yilia/css/base.css?1706799235827"/>
+            <link rel="prev" title="Groovy编程风格指南" href="https://jobslee0.github.io/articles/2024/01/31/1706713777951.html">
+            <link rel="next" title="Groovy闭包" href="https://jobslee0.github.io/articles/2024/01/31/1706713862285.html">
+    <script src="https://cdn.jsdelivr.net/npm/vditor@3.8.4/dist/js/icons/ant.js" async="" id="vditorIconScript"></script></head>
+<body>
+<div class="side fn__flex-column">
+    <div class="overlay">
+        <a onclick="$('.side .toc').show()" href="javascript:void(0)" class="toc-btn">目录</a>
+    </div>
+    <div class="user__sites">
+    <a href="https://ld246.com/member/DragonMoon"
+       title="https://ld246.com/member/DragonMoon"
+       class="user__site"
+       target="_blank" rel="noopener nofollow">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path fill="#d23f31" style="fill: var(--color1, #d23f31)" d="M5.787 17.226h17.033l5.954 9.528c0.47 0.752 0.003 1.361-1.042 1.361h-15.141z"></path>
+            <path d="M10.74 3.927h17.033c1.045 0 1.512 0.609 1.042 1.361l-5.954 9.528h-19.872l6.379-10.209c0.235-0.376 0.849-0.681 1.372-0.681z"></path>
+            <path d="M2.953 17.226h2.839l6.804 10.889h-1.892c-0.523 0-1.137-0.305-1.372-0.681z"></path>
+        </svg>
+    </a>
+
+
+    </div>
+    <header class="content fn__flex-1">
+        <a href="https://jobslee0.github.io">
+            <img class="avatar" src="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100" title="" alt=""/>
+        </a>
+        <hgroup>
+            <h1>
+                <a href="https://jobslee0.github.io">卓恒Lee的小宇宙</a>
+            </h1>
+        </hgroup>
+        <p class="subtitle">
+            山不在高，有仙则名；水不在深，有龙则灵。
+        </p>
+        <nav>
+            <ul>
+                <li>
+                    <a href="https://jobslee0.github.io/tags.html">标签墙</a>
+                    &nbsp; &nbsp;
+                    <a href="https://jobslee0.github.io/archives.html">存档</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    <footer>
+            <div class="vditor-reset">仰望星空
+
+<!-- 公告栏可使用 HTML、JavaScript，比如可以在此加入第三方统计 js --></div>
+        <a rel="alternate" href="https://jobslee0.github.io/rss.xml" title="订阅" class="icon-rss"></a>
+    </footer>
+        <div class="toc">
+            <a onclick="$('.side .toc').hide();" href="javascript:void(0)" class="close">X</a>
+<ul class="article__toc">
+        <li class="toc__h3">
+            <a href="#toc_h3_0">1.1. Eval</a>
+        </li>
+        <li class="toc__h3">
+            <a href="#toc_h3_1">1.2. GroovyShell</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_2">1.2.1. 多种来源</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_3">1.2.2. 在脚本和应用间共享数据</a>
+        </li>
+        <li class="toc__h4">
+            <a href="#toc_h4_4">1.2.3. 自定义脚本类</a>
+        </li>
+        <li class="toc__h3">
+            <a href="#toc_h3_5">1.4. GroovyScriptEngine</a>
+        </li>
+        <li class="toc__h3">
+            <a href="#toc_h3_6">1.5. CompilationUnit</a>
+        </li>
+</ul>        </div>
+</div>
+<main>
+    <article class="post">
+        <header class="fn__flex">
+            <h2 class="fn__flex-1">
+                <a rel="bookmark" href="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html">
+                    Groovy应用集成
+                </a>
+            </h2>
+            <time><span class="icon-date"></span> 2024-02-01</time>
+        </header>
+        <div class="article__footer fn__flex">
+            <span class="icon-tag fn__flex-center"></span>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <div class="tags fn__flex-1 fn__flex-center">
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/Groovy">
+                        Groovy</a>
+                    <a class="tag" rel="tag" href="https://jobslee0.github.io/tags/%E7%BF%BB%E8%AF%91">
+                        翻译</a>
+            </div>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+                <a href="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html#b3logsolocomments"
+                   class="vditor-tooltipped__n vditor-tooltipped link fn__flex-center"
+                   aria-label="评论">
+                    <span data-uvstatcmt="1706713839171">0</span>
+                    <span class="icon-chat"></span>
+                </a>
+            <a class="vditor-tooltipped__n vditor-tooltipped link fn__flex-center"
+               href="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html"
+               aria-label="浏览">
+                <span data-uvstaturl="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html">0</span>
+                <span class="icon-views"></span>
+            </a>
+            <a rel="nofollow" href="https://jobslee0.github.io/authors/1706712761452" class="fn__flex-center">
+                <img class="avatar" title="DragonMoon" alt="DragonMoon"
+                     src="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100"/>
+            </a>
+        </div>
+
+        <section class="abstract vditor-reset">
+            <p>Groovy 语言提出了几种在运行时将自身集成到应用程序（Java 甚至 Groovy）中的方法，从最基本的简单代码执行到最完整的集成缓存和编译器定制。</p>
+<p><strong>本节中编写的所有示例都使用 Groovy，但可以在 Java 中使用相同的集成机制。</strong></p>
+<h3 id="toc_h3_0">1.1. Eval</h3>
+<p>这个<code>groovy.util.Eval</code>类是最简单的方式在运行时动态的执行Groovy。可以使用<code>me</code>方法：</p>
+<pre><code class="language-Plaintext">
+import groovy.util.Evalassert Eval.me('33*3') == 99
+
+assert Eval.me('"foo".toUpperCase()') == 'FOO'
+
+</code></pre>
+<p><code>Eval</code>支持多种参数接收变体来支持简易的表达式：</p>
+<pre><code class="language-Plaintext">
+assert Eval.x(4, '2*x') == 8                (1)
+
+assert Eval.me('k', 4, '2*k') == 8          (2)
+
+assert Eval.xy(4, 5, 'x*y') == 20           (3)
+
+assert Eval.xyz(4, 5, 6, 'x*y+z') == 26     (4)
+
+</code></pre>
+<p>| <strong>1</strong> | 一个绑定了名称为<code>x</code>参数的简易表达式</p>
+<p>| <strong>2</strong> | 跟上面的一样，一个绑定了名称为<code>k</code>参数的简易表达式</p>
+<p>| <strong>3</strong> | 一个绑定了<code>x</code>和<code>y</code>两个绑定参数的简易表达式</p>
+<p>| <strong>4</strong> | 一个绑定了<code>x</code>、<code>y</code>和<code>z</code>三个绑定参数的简易表达式</p>
+<p><code>Eval</code>类使得执行简易的脚本变得容易，但是对于大规模的脚本不行：没有脚本缓存，而且不能执行超过一行的表达式。</p>
+<h3 id="toc_h3_1">1.2. GroovyShell</h3>
+<h4 id="toc_h4_2">1.2.1. 多种来源</h4>
+<p><code>groovy.lang.GroovyShell</code>类是执行脚本的首选方式，能够缓存生成的脚本实例。尽管<code>Eval</code>类能够返回编译后脚本的执行结果，<code>GroovyShell</code>可以提供更多的选择。</p>
+<pre><code class="language-Plaintext">
+def shell = new GroovyShell()                           (1)
+
+def result = shell.evaluate '3*5'                       (2)
+
+def result2 = shell.evaluate(new StringReader('3*5'))   (3)
+
+assert result == result2
+
+def script = shell.parse '3*5'                          (4)
+
+assert script instanceof groovy.lang.Script
+
+assert script.run() == 15                               (5)
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个新的<code>GroovyShell</code>实例</p>
+<p>| <strong>2</strong> | 可以作为<code>Eval</code>直接执行代码</p>
+<p>| <strong>3</strong> | 能够从很多源读取（ <code>String</code> , <code>Reader</code> , <code>File</code> , <code>InputStream</code> ）</p>
+<p>| <strong>4</strong> | 可以延迟脚本的执行。使用<code>parse</code>方法返回一个<code>Script</code>实例</p>
+<p>| <strong>5</strong> | <code>Script</code>定义了一个<code>run</code>方法</p>
+<h4 id="toc_h4_3">1.2.2. 在脚本和应用间共享数据</h4>
+<p>通过使用<code>groovy.lang.Binding</code>去在脚本和应用间共享数据：</p>
+<pre><code class="language-Plaintext">
+def sharedData = new Binding()                          (1)
+
+def shell = new GroovyShell(sharedData)                 (2)
+
+def now = new Date()
+
+sharedData.setProperty('text', 'I am shared data!')     (3)
+
+sharedData.setProperty('date', now)                     (4)
+
+String result = shell.evaluate('"At $date, $text"')     (5)
+
+assert result == "At $now, I am shared data!"
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个包含共享数据的新<code>Binding</code></p>
+<p>| <strong>2</strong> | 使用共享数据创建一个<code>GroovyShell</code></p>
+<p>| <strong>3</strong> | 添加字符串到绑定中</p>
+<p>| <strong>4</strong> | 添加一个日期到绑定中（你可以不必限制于简单的类型）</p>
+<p>| <strong>5</strong> | 执行脚本</p>
+<p>注意，也有可以在脚本中写入绑定：</p>
+<pre><code class="language-Plaintext">
+def sharedData = new Binding()                          (1)
+
+def shell = new GroovyShell(sharedData)                 (2)
+
+
+shell.evaluate('foo=123')                               (3)
+
+assert sharedData.getProperty('foo') == 123             (4)
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个<code>Binding</code>实例</p>
+<p>| <strong>2</strong> | 使用共享数据创建一个新的<code>GroovyShell</code></p>
+<p>| <strong>3</strong> | 在绑定中使用一个<strong>未声明的</strong>变量去存储结果</p>
+<p>| <strong>4</strong> | 在回调中读取结果</p>
+<p>如果你想使用绑定，一个未声明变量是很重要的。像下面例子一样使用<code>def</code>或者<code>explicit</code>类型将会失败，因为你将会创建一个<em>本地</em>变量：</p>
+<pre><code class="language-Plaintext">
+def sharedData = new Binding()
+
+def shell = new GroovyShell(sharedData)
+
+
+shell.evaluate('int foo=123')try {
+
+    assert sharedData.getProperty('foo')
+
+} catch (MissingPropertyException e) {
+
+    println "foo is defined as a local variable"
+
+}
+
+</code></pre>
+<p><strong>你在多线程中使用共享变量时必须非常小心。传递给<code>GroovyShell</code>的<code>Binding</code>实例不是线程安全的，会被所有的脚本共享。</strong></p>
+<p>可以通过利用<code>parse</code>返回的<code>Script</code>实例来解决<code>Binding</code>的共享实例：</p>
+<pre><code class="language-Plaintext">
+def shell = new GroovyShell()def b1 = new Binding(x:3)                       (1)
+
+def b2 = new Binding(x:4)                       (2)
+
+def script = shell.parse('x = 2*x')
+
+script.binding = b1
+
+script.run()
+
+script.binding = b2
+
+script.run()
+
+assert b1.getProperty('x') == 6
+
+assert b2.getProperty('x') == 8
+
+assert b1 != b2
+
+</code></pre>
+<p>| <strong>1</strong> | 将<code>x</code>变量存储在<code>b1</code>中</p>
+<p>| <strong>2</strong> | 将<code>x</code>变量存储在<code>b2</code>中</p>
+<p>但是，你必须知道你仍在共享<strong>同一脚本实例</strong>。因此，如果你有两个线程处理同一个脚本，则无法使用此技术。在这种情况下，你必须确保创建两个不同的脚本实例：</p>
+<pre><code class="language-Plaintext">
+def shell = new GroovyShell()def b1 = new Binding(x:3)
+
+def b2 = new Binding(x:4)
+
+def script1 = shell.parse('x = 2*x')            (1)
+
+def script2 = shell.parse('x = 2*x')            (2)
+
+assert script1 != script2
+
+script1.binding = b1                            (3)
+
+script2.binding = b2                            (4)
+
+def t1 = Thread.start { script1.run() }         (5)
+
+def t2 = Thread.start { script2.run() }         (6)
+
+[t1,t2]*.join()                                 (7)
+
+assert b1.getProperty('x') == 6
+
+assert b2.getProperty('x') == 8
+
+assert b1 != b2
+
+</code></pre>
+<p>| <strong>1</strong> | 为线程1创建一个实例</p>
+<p>| <strong>2</strong> | 为线程2创建一个实例</p>
+<p>| <strong>3</strong> | 将第一个绑定分配给脚本1</p>
+<p>| <strong>4</strong> | 将第一个绑定分配给脚本2</p>
+<p>| <strong>5</strong> | 在单独的线程中启动第一个脚本</p>
+<p>| <strong>6</strong> | 在单独的线程中启动第二个脚本</p>
+<p>| <strong>7</strong> | 等待完成</p>
+<p>如果你需要像这里这样的线程安全，建议直接使用 GroovyClassLoader。</p>
+<h4 id="toc_h4_4">1.2.3. 自定义脚本类</h4>
+<p>我们可以看到<code>parse</code>方法返回一个<code>groovy.lang.Script</code>的实例，但是有可能需要去使用一个自定义的类去扩展<code>Script</code>本身。它可用于为脚本提供额外的行为，如下例所示：</p>
+<pre><code class="language-Plaintext">
+abstract class MyScript extends Script {
+
+    String name
+
+
+    String greet() {
+
+        "Hello, $name!"
+
+    }
+
+}
+
+</code></pre>
+<p>这个自定义类定义了一个叫做<code>name</code>的参数和一个叫做<code>greet</code>的方法。这个类可以通过一个自定义的配置来被用作脚本的基础类：</p>
+<pre><code class="language-Plaintext">
+import org.codehaus.groovy.control.CompilerConfigurationdef config = new CompilerConfiguration()                                    (1)
+
+config.scriptBaseClass = 'MyScript'                                         (2)
+
+def shell = new GroovyShell(this.class.classLoader, new Binding(), config)  (3)
+
+def script = shell.parse('greet()')                                         (4)
+
+assert script instanceof MyScript
+
+script.setName('Michel')
+
+assert script.run() == 'Hello, Michel!'
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个<code>CompilerConfiguration</code>实例</p>
+<p>| <strong>2</strong> | 指定<code>MyScript</code>作为脚本的基础类</p>
+<p>| <strong>3</strong> | 然后在创建 shell 时使用编译器配置</p>
+<p>| <strong>4</strong> | 该脚本现在可以访问新方法<code>greet</code></p>
+<p><strong>你不仅局限于唯一的<em>scriptBaseClass</em>配置。你能够调整任意的编译器配置，包括<a href="https://docs.groovy-lang.org/latest/html/documentation/core-domain-specific-languages.html#compilation-customizers" target="_blank">compilation customizers</a>。</strong></p>
+<p>1.3. GroovyClassLoader</p>
+<p>在上一节，我们已经展示了<code>GroovyShell</code>是一个执行脚本的简单工具，但是除了脚本之外，编译任何东西都变得很复杂。在内部，它使用<code>groovy.lang.GroovyClassLoader</code> ，这是运行时编译和加载类的核心。</p>
+<p>通过使用<code>GroovyClassLoader</code>替代<code>GroovyShell</code>，你将能够加载类，而不是脚本实例：</p>
+<pre><code class="language-Plaintext">
+import groovy.lang.GroovyClassLoaderdef gcl = new GroovyClassLoader()                                           (1)
+
+def clazz = gcl.parseClass('class Foo { void doIt() { println "ok" } }')    (2)
+
+assert clazz.name == 'Foo'                                                  (3)
+
+def o = clazz.newInstance()                                                 (4)
+
+o.doIt()                                                                    (5)
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个新的<code>GroovyClassLoader</code></p>
+<p>| <strong>2</strong> | <code>parseClass</code>将会返回<code>Class</code>的实例</p>
+<p>| <strong>3</strong> | 你可以检查返回的类是否真的是脚本中定义的类</p>
+<p>| <strong>4</strong> | 你可以创建一个新的类实例，它不是脚本</p>
+<p>| <strong>5</strong> | 然后调用它的任何方法</p>
+<p><strong>GroovyClassLoader保留了它创建的所有类的引用，因此很容易造成内存泄漏。特别是，如果你执行两次相同的脚本，如果它是一个字符串，那么你将获得两个不同的类！</strong></p>
+<pre><code class="language-Plaintext">
+import groovy.lang.GroovyClassLoaderdef gcl = new GroovyClassLoader()
+
+def clazz1 = gcl.parseClass('class Foo { }')                                (1)
+
+def clazz2 = gcl.parseClass('class Foo { }')                                (2)
+
+assert clazz1.name == 'Foo'                                                 (3)
+
+assert clazz2.name == 'Foo'
+
+assert clazz1 != clazz2                                                     (4)
+
+</code></pre>
+<p>| <strong>1</strong> | 动态创建一个名为“Foo”的类</p>
+<p>| <strong>2</strong> | 使用单独的<code>parseClass</code>调用创建一个外观相同的类</p>
+<p>| <strong>3</strong> | 确保两个类具有相同的名称</p>
+<p>| <strong>4</strong> | 但它们实际上是不同的！</p>
+<p>原因是<code>GroovyClassLoader</code>不跟踪源文本。如果你想拥有相同的实例，则源<strong>必须</strong>是一个文件，如下例所示：</p>
+<pre><code class="language-Plaintext">
+def gcl = new GroovyClassLoader()
+
+def clazz1 = gcl.parseClass(file)                                           (1)
+
+def clazz2 = gcl.parseClass(new File(file.absolutePath))                    (2)
+
+assert clazz1.name == 'Foo'                                                 (3)
+
+assert clazz2.name == 'Foo'
+
+assert clazz1 == clazz2                                                     (4)
+
+</code></pre>
+<p>| <strong>1</strong> | 从<code>文件</code>中解析一个类</p>
+<p>| <strong>2</strong> | 从不同的文件实例解析一个类，但指向同一个物理文件</p>
+<p>| <strong>3</strong> | 确保我们的类具有相同的名称</p>
+<p>| <strong>4</strong> | 但现在，它们是同一个实例</p>
+<p>使用一个<code>File</code>作为输入，<code>GroovyClassLoader</code>是有能力<strong>缓存</strong>生成的类文件的，这样能够避免在运行时创建多个同源类。</p>
+<h3 id="toc_h3_5">1.4. GroovyScriptEngine</h3>
+<p><code>groovy.util.GroovyScriptEngine</code>类为有脚本依赖的应用程序提供了灵活的脚本重载基础。虽然<code>GroovyShell</code>专注于独立脚本，而<code>GroovyClassLoader</code>处理任何 Groovy 类的动态编译和加载，但是<code>GroovyScriptEngine</code>将在<code>GroovyClassLoader</code>之上添加一个层来处理脚本依赖关系和重新加载。</p>
+<p>为了说明这一点，我们将创建一个脚本引擎并在无限循环中执行代码。首先，你需要创建一个目录，其中包含以下脚本：</p>
+<p>ReloadingTest.groovy</p>
+<pre><code class="language-Plaintext">
+class Greeter {
+
+    String sayHello() {
+
+        def greet = "Hello, world!"
+
+        greet
+
+    }
+
+}new Greeter()
+
+</code></pre>
+<p>然后你可以使用<code>GroovyScriptEngine</code>执行此代码：</p>
+<pre><code class="language-Plaintext">
+def binding = new Binding()
+
+def engine = new GroovyScriptEngine([tmpDir.toURI().toURL()] as URL[])          (1)while (true) {
+
+    def greeter = engine.run('ReloadingTest.groovy', binding)                   (2)
+
+    println greeter.sayHello()                                                  (3)
+
+    Thread.sleep(1000)
+
+}
+
+</code></pre>
+<p>| <strong>1</strong> | 创建一个脚本引擎，它将在我们的源目录中查找源</p>
+<p>| <strong>2</strong> | 执行脚本，它将返回一个<code>Greeter</code>的实例</p>
+<p>| <strong>3</strong> | 打印问候语</p>
+<p>此时，你应该会看到每秒打印一条消息：</p>
+<p>Hello, world!Hello, world!...</p>
+<p>在<strong>不中断</strong>脚本执行的情况下，现在将<code>ReloadingTest</code>文件的内容替换为：</p>
+<p>ReloadingTest.groovy</p>
+<pre><code class="language-Plaintext">
+class Greeter {
+
+    String sayHello() {
+
+        def greet = "Hello, Groovy!"
+
+        greet
+
+    }
+
+}new Greeter()
+
+</code></pre>
+<p>消息应更改为：</p>
+<p>Hello, world!...Hello, Groovy!Hello, Groovy!...</p>
+<p>但也可能依赖于另一个脚本。为了说明这一点，在同一目录中创建以下文件，而不中断正在执行的脚本：</p>
+<p>Dependency.groovy</p>
+<pre><code class="language-Plaintext">
+class Dependency {
+
+    String message = 'Hello, dependency 1'
+
+}
+
+</code></pre>
+<p>并像这样更新<code>ReloadingTest</code>脚本：</p>
+<p>ReloadingTest.groovy</p>
+<pre><code class="language-Plaintext">
+import Dependencyclass Greeter {
+
+    String sayHello() {
+
+        def greet = new Dependency().message
+
+        greet
+
+    }
+
+}new Greeter()
+
+</code></pre>
+<p>这一次，消息应该变为：</p>
+<p>Hello, Groovy!...Hello, dependency 1!Hello, dependency 1!...</p>
+<p>作为最后一个测试，你可以更新<code>Dependency.groovy</code>文件，而无需触及<code>ReloadingTest</code>文件：</p>
+<p>Dependency.groovy</p>
+<pre><code class="language-Plaintext">
+class Dependency {
+
+    String message = 'Hello, dependency 2'
+
+}
+
+</code></pre>
+<p>你应该观察到依赖文件已重新加载：</p>
+<p>Hello, dependency 1!...Hello, dependency 2!Hello, dependency 2!</p>
+<h3 id="toc_h3_6">1.5. CompilationUnit</h3>
+<p>最终，通过直接依赖<code>org.codehaus.groovy.control.CompilationUnit</code>类，可以在编译期间执行更多操作。该类负责确定编译的各个步骤，并允许你引入新步骤，甚至在各个阶段停止编译。例如，对于联合编译器，存根生成是如何完成的。</p>
+<p>但是，不建议覆盖<code>CompilationUnit</code>，只有在没有其他标准解决方案有效的情况下才应该这样做。</p>
+
+                <aside class="fn__flex">
+                        <a class="fn__flex-1 fn__flex-inline" rel="prev" href="https://jobslee0.github.io/articles/2024/01/31/1706713777951.html">
+                            <strong>&lt;</strong>
+                            <span>&nbsp; Groovy编程风格指南&nbsp;&nbsp;&nbsp;</span>
+                        </a>
+                        <a class="fn__flex-inline" rel="next" href="https://jobslee0.github.io/articles/2024/01/31/1706713862285.html">
+                            <span>Groovy闭包&nbsp; </span>
+                            <strong>&gt;</strong>
+                        </a>
+                </aside>
+        </section>
+
+        <footer class="fn-clear share">
+            <div class="fn-right">
+<div class="article__share"
+     data-title="Groovy应用集成"
+     data-blogtitle="卓恒Lee的小宇宙"
+     data-url="https://jobslee0.github.io/articles/2024/01/31/1706713839171.html"
+     data-avatar="https://b3logfile.com/avatar/1672917247069_1672918274394.jpeg?imageView2/1/w/128/h/128/interlace/0/q/100">
+    <span class="item" data-type="qqz">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M22.824 13.989l-8.348 6.287s3.351 0.522 8.404 0.461l-0.23-1.040 7.2-6.549c0.132-0.12 0.183-0.312 0.129-0.487s-0.203-0.299-0.377-0.314l-9.492-0.856-3.708-9.213c-0.068-0.169-0.226-0.279-0.401-0.279s-0.333 0.11-0.401 0.279l-3.708 9.213-9.492 0.856c-0.174 0.015-0.323 0.139-0.377 0.314s-0.004 0.366 0.129 0.487l7.2 6.549-2.158 9.742c-0.040 0.178 0.026 0.365 0.168 0.474 0.142 0.107 0.331 0.115 0.481 0.021l8.158-5.165 8.158 5.165c0.070 0.045 0.147 0.066 0.225 0.066 0.090 0 0.18-0.029 0.256-0.086 0.142-0.109 0.208-0.295 0.168-0.474l-1.707-7.704c0.732-0.386 1.538-1.040 1.538-1.040s-3.195 1.638-14.664 0.838l8.312-6.325s-0.327-0.534-10.744-0.914c-0.697-0.026 8.493-1.83 15.281-0.305z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="wechat">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M9.062 9.203c0-0.859-0.562-1.422-1.422-1.422-0.844 0-1.703 0.562-1.703 1.422 0 0.844 0.859 1.406 1.703 1.406 0.859 0 1.422-0.562 1.422-1.406zM20.672 17.125c0-0.562-0.562-1.125-1.422-1.125-0.562 0-1.125 0.562-1.125 1.125 0 0.578 0.562 1.141 1.125 1.141 0.859 0 1.422-0.562 1.422-1.141zM16.984 9.203c0-0.859-0.562-1.422-1.406-1.422-0.859 0-1.703 0.562-1.703 1.422 0 0.844 0.844 1.406 1.703 1.406 0.844 0 1.406-0.562 1.406-1.406zM26.906 17.125c0-0.562-0.578-1.125-1.422-1.125-0.562 0-1.125 0.562-1.125 1.125 0 0.578 0.562 1.141 1.125 1.141 0.844 0 1.422-0.562 1.422-1.141zM22.75 10.922c-0.359-0.047-0.719-0.063-1.094-0.063-5.375 0-9.625 4.016-9.625 8.953 0 0.828 0.125 1.625 0.359 2.375-0.359 0.031-0.703 0.047-1.063 0.047-1.422 0-2.547-0.281-3.969-0.562l-3.953 1.984 1.125-3.406c-2.828-1.984-4.531-4.547-4.531-7.656 0-5.391 5.094-9.625 11.328-9.625 5.563 0 10.453 3.391 11.422 7.953zM32 19.687c0 2.547-1.688 4.813-3.969 6.516l0.859 2.828-3.109-1.703c-1.141 0.281-2.281 0.578-3.406 0.578-5.391 0-9.625-3.688-9.625-8.219s4.234-8.219 9.625-8.219c5.094 0 9.625 3.688 9.625 8.219z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="weibo">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M13.444 27.064c-5.3 0.525-9.875-1.875-10.219-5.35-0.344-3.481 3.675-6.719 8.969-7.244 5.3-0.525 9.875 1.875 10.212 5.35 0.35 3.481-3.669 6.725-8.963 7.244zM24.038 15.521c-0.45-0.137-0.762-0.225-0.525-0.819 0.512-1.287 0.563-2.394 0.006-3.188-1.038-1.481-3.881-1.406-7.137-0.037 0 0-1.025 0.444-0.762-0.363 0.5-1.613 0.425-2.956-0.356-3.737-1.769-1.769-6.469 0.069-10.5 4.1-3.013 3.006-4.763 6.212-4.763 8.981 0 5.287 6.787 8.506 13.425 8.506 8.7 0 14.494-5.056 14.494-9.069 0-2.431-2.044-3.806-3.881-4.375z"></path>
+            <path d="M29.819 5.833c-2.1-2.331-5.2-3.219-8.063-2.612v0c-0.663 0.144-1.081 0.794-0.938 1.45 0.144 0.662 0.788 1.081 1.45 0.938 2.038-0.431 4.238 0.2 5.731 1.856s1.9 3.913 1.256 5.888v0c-0.206 0.644 0.144 1.331 0.788 1.544 0.644 0.206 1.331-0.144 1.544-0.787v-0.006c0.9-2.762 0.331-5.938-1.769-8.269z"></path>
+            <path d="M26.588 8.752c-1.025-1.138-2.538-1.569-3.925-1.269-0.569 0.119-0.931 0.688-0.813 1.256 0.125 0.569 0.688 0.931 1.25 0.806v0c0.681-0.144 1.419 0.069 1.919 0.619 0.5 0.556 0.637 1.313 0.419 1.975v0c-0.175 0.55 0.125 1.15 0.681 1.331 0.556 0.175 1.15-0.125 1.331-0.681 0.438-1.356 0.163-2.906-0.863-4.037z"></path>
+            <path d="M13.738 20.771c-0.188 0.319-0.594 0.469-0.912 0.337-0.319-0.125-0.412-0.488-0.231-0.794 0.188-0.306 0.581-0.456 0.894-0.337 0.313 0.113 0.425 0.469 0.25 0.794zM12.044 22.933c-0.512 0.819-1.613 1.175-2.438 0.8-0.813-0.369-1.056-1.319-0.544-2.119 0.506-0.794 1.569-1.15 2.388-0.806 0.831 0.356 1.1 1.3 0.594 2.125zM13.969 17.146c-2.519-0.656-5.369 0.6-6.463 2.819-1.119 2.262-0.037 4.781 2.506 5.606 2.638 0.85 5.75-0.456 6.831-2.894 1.069-2.394-0.262-4.85-2.875-5.531z"></path>
+        </svg>
+    </span>
+    <span class="item" data-type="twitter">
+        <svg viewBox="0 0 32 32" width="100%" height="100%">
+            <path d="M32.003 6.075c-1.175 0.525-2.444 0.875-3.769 1.031 1.356-0.813 2.394-2.1 2.887-3.631-1.269 0.75-2.675 1.3-4.169 1.594-1.2-1.275-2.906-2.069-4.794-2.069-3.625 0-6.563 2.938-6.563 6.563 0 0.512 0.056 1.012 0.169 1.494-5.456-0.275-10.294-2.888-13.531-6.862-0.563 0.969-0.887 2.1-0.887 3.3 0 2.275 1.156 4.287 2.919 5.463-1.075-0.031-2.087-0.331-2.975-0.819 0 0.025 0 0.056 0 0.081 0 3.181 2.263 5.838 5.269 6.437-0.55 0.15-1.131 0.231-1.731 0.231-0.425 0-0.831-0.044-1.237-0.119 0.838 2.606 3.263 4.506 6.131 4.563-2.25 1.762-5.075 2.813-8.156 2.813-0.531 0-1.050-0.031-1.569-0.094 2.913 1.869 6.362 2.95 10.069 2.95 12.075 0 18.681-10.006 18.681-18.681 0-0.287-0.006-0.569-0.019-0.85 1.281-0.919 2.394-2.075 3.275-3.394z"></path>
+        </svg>
+    </span>
+    <span class="item__qr"></span>
+</div>            </div>
+        </footer>
+            <div id="relevantArticles" class="abstract"></div>
+            <div id="randomArticles" class="abstract"></div>
+        <br>
+    </article>
+        <div style="padding: 30px 60px 30px 50px;" id="gitalk-container"></div>
+        <div id="b3logsolocomments"></div>
+        <div id="vcomment" style="padding: 30px 60px 30px 50px;" data-name="DragonMoon"
+             data-postId="1706713839171"></div>
+
+<footer class="footer">
+    <div class="fn-clear">
+        浏览数：<span data-uvstaturl="https://jobslee0.github.io">0</span>
+        &nbsp;
+        文章总数：12
+        <br>
+        &copy; 2024
+        <a href="https://jobslee0.github.io">卓恒Lee的小宇宙</a>
+        
+    </div>
+    <span onclick="Util.goTop()" class="icon-goup"></span>
+</footer>
+<script>
+  var Label = {
+    speech: true,
+    servePath: "https://jobslee0.github.io",
+    staticServePath: "https://jobslee0.github.io",
+    luteAvailable: false,
+    hljsStyle: 'github',
+    langLabel: "zh_CN",
+    version: "4.4.0",
+    staticSite: true,
+    showCodeBlockLn: false,
+    articleId: "1706713839171",
+  }
+</script>
+<script src="https://jobslee0.github.io/skins/yilia/js/common.min.js?1706799235827"></script>
+
+
+<script type="text/javascript">
+    Util.addScript('https://jobslee0.github.io/js/page.min.js?1706799235827', 'soloPageScript')
+    var page = new Page({
+        "commentContentCannotEmptyLabel": "评论不能为空",
+        "oId": "1706713839171",
+        "blogHost": "https://jobslee0.github.io",
+        "randomArticles1Label": "随机阅读：",
+        "externalRelevantArticles1Label": "站外相关阅读："
+    });
+    $(document).ready(function () {
+        page.load();
+        page.tips.externalRelevantArticlesDisplayCount = "0";
+            page.loadRandomArticles();
+            page.loadRelevantArticles('1706713839171', '<h4>相关阅读：</h4>');
+        page.share()
+    });
+</script>
+</main>
+</body>
+</html>
+
+<!-- Generated by Latke (https://github.com/88250/latke) in 15ms, 2024/02/01 22:56:39 -->

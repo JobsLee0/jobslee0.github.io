@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>卓恒Lee的小宇宙</title>
+    <link>https://jobslee0.github.io</link>
+    <atom:link href="https://jobslee0.github.io/rss.xml" rel="self" type="application/rss+xml"/>
+    <description>山不在高，有仙则名；水不在深，有龙则灵。</description>
+    <generator>Solo, v4.4.0, https://b3log.org/solo</generator>
+    <lastBuildDate>Thu, 01 Feb 2024 22:56:39 +0800</lastBuildDate>
+    <language>zh-cn</language>
+    <item>
+      <title>B树与B+树主要区别点</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798666849.html</link>
+      <description><![CDATA[<p>B树与B+树主要区别点简析</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798666849.html</guid>
+      <category>B+树</category>
+      <category>B树</category>
+      <category>原创</category>
+      <category>区别</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:43 +0800</pubDate>
+    </item>
+    <item>
+      <title>几种常见的IO模型</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798589315.html</link>
+      <description><![CDATA[<p>几种常见的IO模型示意图</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798589315.html</guid>
+      <category>原创</category>
+      <category>NIO</category>
+      <category>IO</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:38 +0800</pubDate>
+    </item>
+    <item>
+      <title>PSQ队列核心原理简析</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798443489.html</link>
+      <description><![CDATA[<p>简单、易用、精妙的PSQ队列原理简析</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798443489.html</guid>
+      <category>队列</category>
+      <category>原创</category>
+      <category>PSQ</category>
+      <category>原理</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:32 +0800</pubDate>
+    </item>
+    <item>
+      <title>记一次JVM泄漏问题及解决方案</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798263657.html</link>
+      <description><![CDATA[<p>记一次整个部门耗时6个月未解决的JVM泄漏问题</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798263657.html</guid>
+      <category>JVM</category>
+      <category>原创</category>
+      <category>内存泄漏</category>
+      <category>Java</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:25 +0800</pubDate>
+    </item>
+    <item>
+      <title>MongoDB实战问答</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706797848482.html</link>
+      <description><![CDATA[<p>一些基于MongoDB实现，提出的问题和解答</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706797848482.html</guid>
+      <category>原创</category>
+      <category>MongoDB</category>
+      <category>问答</category>
+      <category>实战</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:09 +0800</pubDate>
+    </item>
+    <item>
+      <title>MongoDB之ObjectId详解</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706797595619.html</link>
+      <description><![CDATA[<p>MongoDB中ObjectId的详解及妙用</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706797595619.html</guid>
+      <category>MongoDB</category>
+      <category>原创</category>
+      <category>ObjectId</category>
+      <pubDate>Thu, 01 Feb 2024 22:45:01 +0800</pubDate>
+    </item>
+    <item>
+      <title>算法学习笔记</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798113215.html</link>
+      <description><![CDATA[<p>极浅、极少量的算法学习笔记</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798113215.html</guid>
+      <category>原创</category>
+      <category>算法</category>
+      <category>学习</category>
+      <category>笔记</category>
+      <pubDate>Thu, 01 Feb 2024 22:35:13 +0800</pubDate>
+    </item>
+    <item>
+      <title>Trouble Shoot</title>
+      <link>https://jobslee0.github.io/articles/2024/02/01/1706798005476.html</link>
+      <description><![CDATA[<p>偶发性疑难杂症解决方案……</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/02/01/1706798005476.html</guid>
+      <category>原创</category>
+      <category>TroubleShoot</category>
+      <pubDate>Thu, 01 Feb 2024 22:33:48 +0800</pubDate>
+    </item>
+    <item>
+      <title>Groovy闭包</title>
+      <link>https://jobslee0.github.io/articles/2024/01/31/1706713862285.html</link>
+      <description><![CDATA[<p>Groovy翻译系列第三节，函数作为一等公民，全面讲解Groovy在闭包方面的特性。</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/01/31/1706713862285.html</guid>
+      <category>Groovy</category>
+      <category>翻译</category>
+      <pubDate>Thu, 01 Feb 2024 22:23:59 +0800</pubDate>
+    </item>
+    <item>
+      <title>Groovy应用集成</title>
+      <link>https://jobslee0.github.io/articles/2024/01/31/1706713839171.html</link>
+      <description><![CDATA[<p>Groovy翻译系列第二节，翻译一下集成说明。</p>]]></description>
+      <author>DragonMoon</author>
+      <guid>https://jobslee0.github.io/articles/2024/01/31/1706713839171.html</guid>
+      <category>翻译</category>
+      <category>Groovy</category>
+      <pubDate>Thu, 01 Feb 2024 22:18:50 +0800</pubDate>
+    </item>
+  </channel>
+</rss>
